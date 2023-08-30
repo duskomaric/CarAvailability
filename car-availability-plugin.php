@@ -9,6 +9,7 @@ ini_set('display_errors', 1);
 
 
 use CarAvailability\includes\CarAvailabilityFrontendForm;
+use CarAvailability\includes\CarAvailabilityAdminSettings;
 
 function car_availability_enqueue_scripts() {
     wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/styles.css');
@@ -22,9 +23,14 @@ function car_availability_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'car_availability_enqueue_scripts');
 
 require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityFrontendForm.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityAdminSettings.php');
+
 
 $car_availability_frontend_form = new CarAvailabilityFrontendForm();
 $car_availability_frontend_form->init();
+
+$car_availability_admin_settings = new CarAvailabilityAdminSettings();
+$car_availability_admin_settings->init();
 
 function car_availability_shortcode_form() {
     global $car_availability_frontend_form;
@@ -33,4 +39,3 @@ function car_availability_shortcode_form() {
     return ob_get_clean();
 }
 add_shortcode('car_availability_form', 'car_availability_shortcode_form');
-
