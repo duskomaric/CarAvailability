@@ -10,6 +10,7 @@ ini_set('display_errors', 1);
 
 use CarAvailability\includes\CarAvailabilityFrontend;
 use CarAvailability\includes\CarAvailabilityAdminSettings;
+use CarAvailability\includes\CarAvailabilityLocationsFrontend;
 
 function car_availability_enqueue_scripts() {
     wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/styles.css');
@@ -24,6 +25,7 @@ add_action('wp_enqueue_scripts', 'car_availability_enqueue_scripts');
 
 require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityFrontend.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityAdminSettings.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityLocationsFrontend.php');
 
 
 $car_availability_frontend_form = new CarAvailabilityFrontend();
@@ -31,3 +33,6 @@ $car_availability_frontend_form->init();
 
 $car_availability_admin_settings = new CarAvailabilityAdminSettings();
 $car_availability_admin_settings->init();
+
+$car_availability_locations = new CarAvailabilityLocationsFrontend();
+$car_availability_locations->init();
