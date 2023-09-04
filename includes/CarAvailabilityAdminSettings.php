@@ -75,8 +75,20 @@ class CarAvailabilityAdminSettings {
         $field = $args['field'];
         $value = $options[$field] ?? '';
 
-        $input_type = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
+        $isPasswordField = ($field === 'password' || $field === 'secret');
+        $inputType = $isPasswordField ? 'password' : 'text';
+        $inputClass = $isPasswordField ? 'password-input' : '';
 
-        echo "<input type='$input_type' name='car_availability_settings[$field]' value='$value' />";
+        $dataAttribute = $isPasswordField ? 'data-password-input' : '';
+        $fieldName = ucfirst($field); // Capitalize the first letter of the field name
+
+        echo "<input type='$inputType' id='$field-input' name='car_availability_settings[$field]' value='$value' class='$inputClass' $dataAttribute />";
+
+        if ($isPasswordField) {
+            echo "<label><input type='checkbox' class='show-password-checkbox' data-target='$field-input'> Show $fieldName</label>";
+        }
     }
+
+
+
 }

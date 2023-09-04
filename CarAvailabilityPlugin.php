@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Car Availability Plugin
  * Description: A plugin to check car availability using an external API.
- * Version: 1.10
+ * Version: 1.3.0
  */
 
 namespace CarAvailability;
@@ -24,8 +24,9 @@ use CarAvailability\includes\CarAvailabilityOffices;
 class CarAvailabilityPlugin {
 
     public function __construct() {
-        add_action('wp_enqueue_scripts', array($this, 'enqueueScripts'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueueFrontendStilesAndScripts'));
         add_action('admin_enqueue_scripts', array($this, 'enqueueAdminStyles'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
 
         $frontend = new CarAvailabilityFrontend();
         $frontend->init();
@@ -40,20 +41,25 @@ class CarAvailabilityPlugin {
         $carCategories->init();
     }
 
-    public function enqueueScripts(): void
+    public function enqueueFrontendStilesAndScripts(): void
     {
-        wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/styles.css');
-
         if (has_shortcode(get_post()->post_content, 'car_availability_frontend_form_render') ||
-            has_shortcode(get_post()->post_content, 'car_availability_offices_render')) {
-            wp_enqueue_script('jquery'); // Make sure jQuery is loaded
+            has_shortcode(get_post()->post_content, 'car_availability_offices_render') ||
+            has_shortcode(get_post()->post_content, 'car_availability_car_categories_render')) {
+            wp_enqueue_script('jquery');
             wp_enqueue_script('car-availability-scripts', plugin_dir_url(__FILE__) . 'assets/js/script.js', array('jquery'), null, true);
+            wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/styles.css');
         }
     }
 
     public function enqueueAdminStyles(): void
     {
         wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/car-availability-admin-settings-styles.css');
+    }
+
+    public function enqueueAdminScripts(): void
+    {
+        wp_enqueue_script('car-availability-admin-script', plugin_dir_url(__FILE__) . 'assets/js/car-availability-admin-settings-script.js', array('jquery'), null, true);
     }
 }
 
