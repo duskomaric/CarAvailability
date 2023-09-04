@@ -2,12 +2,14 @@
 namespace CarAvailability\includes;
 
 class CarAvailabilityAdminSettings {
-    public function init() {
+    public function init(): void
+    {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
     }
 
-    public function add_admin_menu() {
+    public function add_admin_menu(): void
+    {
         add_menu_page(
             'Car Availability Settings',
             'Car Availability',
@@ -17,9 +19,10 @@ class CarAvailabilityAdminSettings {
         );
     }
 
-    public function settings_page() {
+    public function settings_page(): void
+    {
         ?>
-        <div class="wrap">
+        <div class="wrap car-availability">
             <h1>Car Availability Plugin Settings</h1>
             <form method="post" action="options.php">
                 <?php settings_fields('car_availability_settings_group'); ?>
@@ -30,8 +33,28 @@ class CarAvailabilityAdminSettings {
         <?php
     }
 
-    public function register_settings() {
+    public function register_settings(): void
+    {
         register_setting('car_availability_settings_group', 'car_availability_settings');
+
+        $fields = array(
+            'username' => 'API Username',
+            'password' => 'API Password',
+            'client_id' => 'Client Id',
+            'secret' => 'Secret',
+            'api_base_url' => 'API Base Url',
+        );
+
+        foreach ($fields as $field => $label) {
+            add_settings_field(
+                $field,
+                $label,
+                array($this, 'field_callback'),
+                'car-availability-settings',
+                'car_availability_section',
+                array('field' => $field)
+            );
+        }
 
         add_settings_section(
             'car_availability_section',
@@ -39,51 +62,21 @@ class CarAvailabilityAdminSettings {
             array($this, 'section_callback'),
             'car-availability-settings'
         );
-
-        add_settings_field(
-            'username',
-            'API Username',
-            array($this, 'username_field_callback'),
-            'car-availability-settings',
-            'car_availability_section'
-        );
-
-        add_settings_field(
-            'password',
-            'API Password',
-            array($this, 'password_field_callback'),
-            'car-availability-settings',
-            'car_availability_section'
-        );
-
-        add_settings_field(
-            'api_endpoint',
-            'API Endpoint',
-            array($this, 'api_endpoint_field_callback'),
-            'car-availability-settings',
-            'car_availability_section'
-        );
     }
 
-    public function section_callback() {
+    public function section_callback(): void
+    {
         echo '<p>Enter your API credentials and endpoint below:</p>';
     }
 
-    public function username_field_callback() {
+    public function field_callback($args): void
+    {
         $options = get_option('car_availability_settings');
-        $username = isset($options['username']) ? $options['username'] : '';
-        echo "<input type='text' name='car_availability_settings[username]' value='$username' />";
-    }
+        $field = $args['field'];
+        $value = $options[$field] ?? '';
 
-    public function password_field_callback() {
-        $options = get_option('car_availability_settings');
-        $password = isset($options['password']) ? $options['password'] : '';
-        echo "<input type='password' name='car_availability_settings[password]' value='$password' />";
-    }
+        $input_type = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
 
-    public function api_endpoint_field_callback() {
-        $options = get_option('car_availability_settings');
-        $api_endpoint = isset($options['api_endpoint']) ? $options['api_endpoint'] : '';
-        echo "<input type='text' name='car_availability_settings[api_endpoint]' value='$api_endpoint' />";
+        echo "<input type='$input_type' name='car_availability_settings[$field]' value='$value' />";
     }
 }
