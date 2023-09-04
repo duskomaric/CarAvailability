@@ -7,8 +7,10 @@
 
 namespace CarAvailability;
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if (!defined('WP_DEBUG') || !WP_DEBUG) {
+    error_reporting(0);
+    ini_set('display_errors', 0);
+}
 
 require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityFrontend.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/CarAvailabilityAdminSettings.php');
