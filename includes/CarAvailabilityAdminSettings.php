@@ -20,6 +20,14 @@ class CarAvailabilityAdminSettings
             array($this, 'settings_page'),
             'dashicons-cloud'
         );
+        add_submenu_page(
+            'car-availability-settings',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'car-availability-settings',
+            array($this, 'settings_page')
+        );
 
         add_submenu_page(
             'car-availability-settings',
