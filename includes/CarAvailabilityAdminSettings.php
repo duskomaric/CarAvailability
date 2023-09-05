@@ -74,7 +74,7 @@ class CarAvailabilityAdminSettings
 
     public function test_api_page(): void
     {
-        $default_tab = null;
+        $default_tab = 'test-token';
         $tab = $_GET['tab'] ?? $default_tab;
 
         $tabs = array(
