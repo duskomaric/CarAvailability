@@ -17,6 +17,7 @@
             <?php foreach ($cars as $car) : ?>
                 <div class="car">
                     <p><?php echo $car['ModelName']; ?> - <?php echo $car['Amount']; ?></p>
+                    <img class="car-image" src="<?php echo $car['CarModelImageURL']?>" /> 
                     <button type="button" onclick="selectCar('<?php echo $car['ModelName']; ?>', '<?php echo $car['Amount']; ?>')">Choose</button>
                 </div>
             <?php endforeach; ?>
