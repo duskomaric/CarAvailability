@@ -3,7 +3,7 @@ A plugin to check car availability using an external API
 
 
 ## Usage
-Available  shortcodes:
+Available shortcodes:
 
 ```
 [car_availability_frontend_form_render]

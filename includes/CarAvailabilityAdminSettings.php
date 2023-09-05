@@ -51,7 +51,6 @@ class CarAvailabilityAdminSettings {
             <form method="post">
                 <?php
 
-                settings_fields('car_availability_settings_test_api_group');
                 do_settings_sections('car-availability-test-api');
 
                 if (isset($_POST['test_token'])) {
@@ -69,7 +68,7 @@ class CarAvailabilityAdminSettings {
                 }
 
                 if (empty($response)) {
-                    echo '<textarea rows="15" cols="50" style="width: 100%;" readonly></textarea>';
+                    echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>Last response: '. get_option('car_availability_api_response').'</textarea>';
                 }
                 ?>
             </form>
@@ -160,6 +159,7 @@ class CarAvailabilityAdminSettings {
     public function display_response($response): void
     {
         if (!empty($response)) {
+            update_option('car_availability_api_response', print_r($response, true));
             echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>' . print_r($response, true) . '</textarea>';
         }
     }
