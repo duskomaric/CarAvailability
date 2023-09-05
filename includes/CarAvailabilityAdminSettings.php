@@ -2,6 +2,7 @@
 namespace CarAvailability\includes;
 
 class CarAvailabilityAdminSettings {
+
     public function init(): void
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -17,13 +18,22 @@ class CarAvailabilityAdminSettings {
             'car-availability-settings',
             array($this, 'settings_page')
         );
+
+        add_submenu_page(
+            'car-availability-settings',
+            'Test API',
+            'Test API',
+            'manage_options',
+            'car-availability-test-api',
+            array($this, 'test_api_page')
+        );
     }
 
     public function settings_page(): void
     {
         ?>
         <div class="wrap car-availability">
-            <h1>Car Availability Plugin Settings</h1>
+            <h1>Car Availability</h1>
             <form method="post" action="options.php">
                 <?php settings_fields('car_availability_settings_group'); ?>
                 <?php do_settings_sections('car-availability-settings'); ?>
@@ -33,11 +43,46 @@ class CarAvailabilityAdminSettings {
         <?php
     }
 
+    public function test_api_page(): void
+    {
+        ?>
+        <div class="wrap car-availability">
+            <h1>Car Availability</h1>
+            <form method="post">
+                <?php
+
+                settings_fields('car_availability_settings_test_api_group');
+                do_settings_sections('car-availability-test-api');
+
+                if (isset($_POST['test_token'])) {
+                    (new CarAvailabilityApi())->removeToken();
+                    $response = (new CarAvailabilityApi())->getToken();
+                    $this->display_response($response);
+                }
+                if (isset($_POST['test_car_categories'])) {
+                    $response = (new CarAvailabilityApi())->getCarCategories();
+                    $this->display_response($response);
+                }
+                if (isset($_POST['test_offices'])) {
+                    $response = (new CarAvailabilityApi())->getOffices();
+                    $this->display_response($response);
+                }
+
+                if (empty($response)) {
+                    echo '<textarea rows="15" cols="50" style="width: 100%;" readonly></textarea>';
+                }
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
     public function register_settings(): void
     {
         register_setting('car_availability_settings_group', 'car_availability_settings');
+        register_setting('car_availability_settings_test_api_group', 'car_availability_settings');
 
-        $fields = array(
+        $fields['settings_page'] = array(
             'username' => 'API Username',
             'password' => 'API Password',
             'client_id' => 'Client Id',
@@ -45,7 +90,7 @@ class CarAvailabilityAdminSettings {
             'api_base_url' => 'API Base Url',
         );
 
-        foreach ($fields as $field => $label) {
+        foreach ($fields['settings_page'] as $field => $label) {
             add_settings_field(
                 $field,
                 $label,
@@ -58,21 +103,41 @@ class CarAvailabilityAdminSettings {
 
         add_settings_section(
             'car_availability_section',
-            'Car Availability API Settings',
-            array($this, 'section_callback'),
+            'Car Availability | API credentials',
+            function(){ echo 'Enter your API credentials and endpoint below:';},
             'car-availability-settings'
         );
-    }
 
-    public function section_callback(): void
-    {
-        echo '<p>Enter your API credentials and endpoint below:</p>';
+        $fields['test_api_page'] = array(
+            'test_token' => 'Test Token',
+            'test_offices' => 'Test Offices',
+            'test_car_categories' => 'Test Car Categories'
+        );
+
+        foreach ($fields['test_api_page'] as $field => $label) {
+            add_settings_field(
+                $field,
+                $label,
+                array($this, 'field_callback'),
+                'car-availability-test-api',
+                'car_availability_test_api_section',
+                array('field' => $field, 'label' => $label)
+            );
+        }
+
+        add_settings_section(
+            'car_availability_test_api_section',
+            'Car Availability | API Test',
+            function(){ echo 'Test API responses here';},
+            'car-availability-test-api'
+        );
     }
 
     public function field_callback($args): void
     {
         $options = get_option('car_availability_settings');
         $field = $args['field'];
+        $label = $args['label'];
         $value = $options[$field] ?? '';
 
         $isPasswordField = ($field === 'password' || $field === 'secret');
@@ -80,15 +145,22 @@ class CarAvailabilityAdminSettings {
         $inputClass = $isPasswordField ? 'password-input' : '';
 
         $dataAttribute = $isPasswordField ? 'data-password-input' : '';
-        $fieldName = ucfirst($field); // Capitalize the first letter of the field name
 
-        echo "<input type='$inputType' id='$field-input' name='car_availability_settings[$field]' value='$value' class='$inputClass' $dataAttribute />";
+        if (in_array($field, ['test_offices', 'test_car_categories', 'test_token'])){
+            submit_button($label, 'primary', $field, false);
+        } else {
+            echo "<input type='$inputType' id='$field-input' name='car_availability_settings[$field]' value='$value' class='$inputClass' $dataAttribute />";
 
-        if ($isPasswordField) {
-            echo "<label><input type='checkbox' class='show-password-checkbox' data-target='$field-input'> Show $fieldName</label>";
+            if ($isPasswordField) {
+                echo "<label><input type='checkbox' class='show-password-checkbox' data-target='$field-input'> Show $label</label>";
+            }
         }
     }
 
-
-
+    public function display_response($response): void
+    {
+        if (!empty($response)) {
+            echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>' . print_r($response, true) . '</textarea>';
+        }
+    }
 }

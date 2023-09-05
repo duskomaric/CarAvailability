@@ -31,6 +31,20 @@ class CarAvailabilityApi
         return $elapsed_time > 24 * 60 * 60;
     }
 
+    public function removeToken(): bool
+    {
+        delete_option('car_availability_token');
+        delete_option('car_availability_token_saved_time');
+
+        if (get_option('car_availability_token') === false &&
+            get_option('car_availability_token_saved_time') === false)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getToken(): string
     {
         if (!$this->isTokenExpired()) {
