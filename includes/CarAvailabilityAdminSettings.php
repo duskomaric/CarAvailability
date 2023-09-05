@@ -50,8 +50,27 @@ class CarAvailabilityAdminSettings {
             <h1>Car Availability</h1>
             <form method="post">
                 <?php
-
                 do_settings_sections('car-availability-test-api');
+                ?>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" name="office_out" placeholder="Office Out Id" style="margin-right: 10px;">
+                    <input type="text" name="office_in" placeholder="Office In Id" style="margin-right: 10px;">
+                    <input type="date" name="date_out" style="margin-right: 10px;">
+                    <input type="date" name="date_in" style="margin-right: 10px;">
+                    <?php submit_button('Test Check Availability', 'primary', 'test_check_availability', false); ?>
+                </div>
+                <?php
+
+                if (isset($_POST['test_check_availability'])) {
+                    $response = (new CarAvailabilityApi())
+                        ->checkAvailability(
+                                $_POST['office_out'],
+                                $_POST['office_in'],
+                                $_POST['date_out'],
+                                $_POST['date_in']
+                        );
+                    $this->display_response($response);
+                }
 
                 if (isset($_POST['test_token'])) {
                     (new CarAvailabilityApi())->removeToken();
