@@ -39,6 +39,11 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.wrap.car-availability .nav-tab-active {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #f9f9f9;
+}
+
 .wrap.car-availability form {
     display: flex;
     flex-direction: column;
@@ -75,7 +80,19 @@
     transition: background-color 0.3s ease !important;
 }
 
-input[type="submit"]:hover {
+.wrap.car-availability input[type="submit"]:hover {
     background-color: #c0392b !important;
     transition: background-color 0.3s ease !important;
+}
+
+.wrap.car-availability .show-password-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    color: #e74c3c !important;
+}
+
+.wrap.car-availability .show-password-icon.dashicons-visibility {
+    color: #c0392b !important;
 }

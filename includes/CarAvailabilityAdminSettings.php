@@ -89,7 +89,7 @@ class CarAvailabilityAdminSettings
         echo '<p>Test API EP here and inspect response</p>';
         echo '<h2 class="nav-tab-wrapper">';
         foreach ($tabs as $tab_key => $tab_label) {
-            $active = ($tab === $tab_key) ? 'nav-tab-active' : ''; // Check if the current tab is active
+            $active = ($tab === $tab_key) ? 'nav-tab-active' : '';
             echo '<a href="?page=car-availability-test-api&tab=' . $tab_key . '" class="nav-tab ' . $active . '">' . $tab_label . '</a>';
         }
         echo '</h2>';
@@ -166,24 +166,40 @@ class CarAvailabilityAdminSettings
             'api_base_url' => 'API Url',
         );
 
-        foreach ($fields as $field => $label) {
-            $value = isset($credentials[$field]) ? esc_attr($credentials[$field]) : '';
-            $inputType = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
-            ?>
-            <div>
-                <label for="<?= $field ?>-input"><?= $label ?></label>
-                <input type="<?= $inputType ?>" id="<?= $field ?>-input"
-                       name="car_availability_settings[<?= $field ?>]" value="<?= $value ?>" class="regular-text">
-                <?php if ($inputType === 'password') { ?>
-                    <label class="show-input-value">
-                        <input type="checkbox" class="show-password-checkbox" data-target="<?= $field ?>-input"> Show
-                    </label>
-                <?php } ?>
-            </div>
-        <?php }
-
         ?>
-        <input type="submit" name="save_credentials" class="button button-primary" value="Save Changes">
+        <div>
+            <form method="post">
+                <?php
+                foreach ($fields as $field => $label) {
+                    $value = isset($credentials[$field]) ? esc_attr($credentials[$field]) : '';
+                    $inputType = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
+                    ?>
+                    <div>
+                        <label for="<?= $field ?>-input"><?= $label ?></label>
+                        <?php
+                        if ($inputType === 'password') {
+                            ?>
+                            <div style="position: relative;">
+                                <input type="password" id="<?= $field ?>-input"
+                                       name="car_availability_settings[<?= $field ?>]" value="<?= $value ?>" class="regular-text">
+                                <span class="dashicons dashicons-visibility show-password-icon"
+                                      data-target="<?= $field ?>-input"></span>
+                            </div>
+                            <?php
+                        } else {
+                            ?>
+                            <input type="<?= $inputType ?>" id="<?= $field ?>-input"
+                                   name="car_availability_settings[<?= $field ?>]" value="<?= $value ?>" class="regular-text">
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <?php
+                }
+                ?>
+                <input type="submit" name="save_credentials" class="button button-primary" value="Save Changes">
+            </form>
+        </div>
         <?php
 
         if (isset($_POST['save_credentials'])) {
@@ -191,6 +207,8 @@ class CarAvailabilityAdminSettings
             echo '<div class="updated"><p>Settings saved.</p></div>';
         }
     }
+
+
 
     public function render_email_settings_tab(): void
     {
