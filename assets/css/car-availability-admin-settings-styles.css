@@ -1,3 +1,31 @@
+/* menu */
+#toplevel_page_car-availability-settings > a {
+    color: #fff !important;
+    background-color: #e74c3c !important;
+    text-decoration: none !important;
+    transition: background-color 0.3s, color 0.3s !important;
+}
+
+#toplevel_page_car-availability-settings > a:hover {
+    background-color: #c0392b !important;
+}
+
+#toplevel_page_car-availability-settings.current > a {
+    background-color: #c0392b !important;
+}
+
+#toplevel_page_car-availability-settings li a {
+    color: #fff !important;
+    background-color: #c0392b !important;
+    text-decoration: none !important;
+    transition: background-color 0.3s, color 0.3s !important;
+}
+
+#toplevel_page_car-availability-settings li a:hover {
+    background-color: #c0392b !important;
+}
+/* menu:end */
+
 .wrap.car-availability {
     max-width: 800px;
     margin: 20px auto;
@@ -8,8 +36,22 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.wrap.car-availability form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.wrap.car-availability .nav-tab-wrapper {
+    margin-bottom: 20px;
+}
+
+.wrap.car-availability .show-input-value {
+    display: block;
+}
+
 input[type="text"],
-input[type="date"],
+input[type="datetime-local"],
 input[type="password"] {
     width: 100%;
     padding: 10px;
@@ -21,10 +63,11 @@ input[type="password"] {
 
 input[type="submit"] {
     color: #fff !important;
-    padding: 10px 20px !important; /* Adjust padding for a smaller button */
+    background-color: #e74c3c !important;
+    padding: 10px 20px !important;
     border: none !important;
     border-radius: 3px !important;
-    font-size: 16px !important; /* Adjust font size for better readability */
+    font-size: 16px !important;
     cursor: pointer !important;
-    transition: background-color 0.3s ease !important; /* Add a smooth transition effect */
+    transition: background-color 0.3s ease !important;
 }

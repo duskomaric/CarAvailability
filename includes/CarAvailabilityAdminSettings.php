@@ -1,12 +1,13 @@
 <?php
+
 namespace CarAvailability\includes;
 
-class CarAvailabilityAdminSettings {
+class CarAvailabilityAdminSettings
+{
 
     public function init(): void
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
-        add_action('admin_init', array($this, 'register_settings'));
     }
 
     public function add_admin_menu(): void
@@ -31,147 +32,188 @@ class CarAvailabilityAdminSettings {
 
     public function settings_page(): void
     {
-        ?>
-        <div class="wrap car-availability">
-            <h1>Car Availability</h1>
-            <form method="post" action="options.php">
-                <?php settings_fields('car_availability_settings_group'); ?>
-                <?php do_settings_sections('car-availability-settings'); ?>
-                <?php submit_button(); ?>
-            </form>
-        </div>
-        <?php
+        $default_tab = 'credentials';
+        $tab = $_GET['tab'] ?? $default_tab;
+
+        $tabs = array(
+            'credentials' => 'API Credentials',
+            'email-settings' => 'Email Settings',
+        );
+
+        echo '<div class="wrap car-availability">';
+        echo '<h1>Car Availability | Settings</h1>';
+        echo '<p>Add necessary settings here</p>';
+        echo '<h2 class="nav-tab-wrapper">';
+        foreach ($tabs as $tab_key => $tab_label) {
+            $active = ($tab === $tab_key) ? 'nav-tab-active' : '';
+            echo '<a href="?page=car-availability-settings&tab=' . $tab_key . '" class="nav-tab ' . $active . '">' . $tab_label . '</a>';
+        }
+        echo '</h2>';
+        echo '<form method="post">';
+
+        switch ($tab) {
+            case 'email-settings': $this->render_email_settings_tab();
+                break;
+            default: $this->render_credentials_tab();
+                break;
+        }
+
+        echo '</form>';
+        echo '</div>';
+        echo '</div>';
     }
 
     public function test_api_page(): void
     {
-        ?>
-        <div class="wrap car-availability">
-            <h1>Car Availability</h1>
-            <form method="post">
-                <?php
-                do_settings_sections('car-availability-test-api');
-                ?>
-                <div style="display: flex; align-items: center;">
-                    <input type="text" name="office_out" placeholder="Office Out Id" style="margin-right: 10px;">
-                    <input type="text" name="office_in" placeholder="Office In Id" style="margin-right: 10px;">
-                    <input type="date" name="date_out" style="margin-right: 10px;">
-                    <input type="date" name="date_in" style="margin-right: 10px;">
-                    <?php submit_button('Test Check Availability', 'primary', 'test_check_availability', false); ?>
-                </div>
-                <?php
+        $default_tab = null;
+        $tab = $_GET['tab'] ?? $default_tab;
 
-                if (isset($_POST['test_check_availability'])) {
-                    $response = (new CarAvailabilityApi())
-                        ->checkAvailability(
-                                $_POST['office_out'],
-                                $_POST['office_in'],
-                                $_POST['date_out'],
-                                $_POST['date_in']
-                        );
-                    $this->display_response($response);
-                }
+        $tabs = array(
+            'test-token' => 'Test Token',
+            'test-car-categories' => 'Test Car Categories',
+            'test-offices' => 'Test Offices',
+            'test-check-availability' => 'Test Check Availability',
+        );
 
-                if (isset($_POST['test_token'])) {
-                    (new CarAvailabilityApi())->removeToken();
-                    $response = (new CarAvailabilityApi())->getToken();
-                    $this->display_response($response);
-                }
-                if (isset($_POST['test_car_categories'])) {
-                    $response = (new CarAvailabilityApi())->getCarCategories();
-                    $this->display_response($response);
-                }
-                if (isset($_POST['test_offices'])) {
-                    $response = (new CarAvailabilityApi())->getOffices();
-                    $this->display_response($response);
-                }
+        echo '<div class="wrap car-availability">';
+        echo '<h1>Car Availability | Test API</h1>';
+        echo '<p>Test API EP here and inspect response</p>';
+        echo '<h2 class="nav-tab-wrapper">';
+        foreach ($tabs as $tab_key => $tab_label) {
+            $active = ($tab === $tab_key) ? 'nav-tab-active' : ''; // Check if the current tab is active
+            echo '<a href="?page=car-availability-test-api&tab=' . $tab_key . '" class="nav-tab ' . $active . '">' . $tab_label . '</a>';
+        }
+        echo '</h2>';
 
-                if (empty($response)) {
-                    echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>Last response: '. get_option('car_availability_api_response').'</textarea>';
-                }
-                ?>
-            </form>
-        </div>
-        <?php
+        echo '<form method="post">';
+
+        switch ($tab) {
+            case 'test-car-categories': submit_button($tabs['test-car-categories'], 'primary', 'test_car_categories', false);
+                break;
+
+            case 'test-offices': submit_button($tabs['test-offices'], 'primary', 'test_offices', false);
+                break;
+
+            case 'test-check-availability': $this->render_check_availability_tab();
+                break;
+            default: submit_button($tabs['test-token'], 'primary', 'test_token', false);
+                break;
+        }
+
+        echo '</form>';
+        echo '</div>';
+
+        if (isset($_POST['test_check_availability'])) {
+            $response = (new CarAvailabilityApi())
+                ->checkAvailability(
+                    $_POST['office_out'],
+                    $_POST['office_in'],
+                    $_POST['date_out'],
+                    $_POST['date_in']
+                );
+        }
+
+        if (isset($_POST['test_token'])) {
+            (new CarAvailabilityApi())->removeToken();
+            $response = (new CarAvailabilityApi())->getToken();
+        }
+        if (isset($_POST['test_car_categories'])) {
+            $response = (new CarAvailabilityApi())->getCarCategories();
+        }
+        if (isset($_POST['test_offices'])) {
+            $response = (new CarAvailabilityApi())->getOffices();
+        }
+
+        echo '<div class="wrap car-availability"><h2 class="nav-tab-wrapper">';
+        if (empty($response)) {
+            echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>Last response: ' . get_option('car_availability_api_response') . '</textarea>';
+        } else {
+            $this->display_response($response);
+        }
+        echo '</div>';
     }
 
-    public function register_settings(): void
+    public function render_check_availability_tab(): void
     {
-        register_setting('car_availability_settings_group', 'car_availability_settings');
-        register_setting('car_availability_settings_test_api_group', 'car_availability_settings');
+        echo '<div style="display: flex; align-items: center;">
+                                <input type="text" name="office_out" placeholder="Office Out Id"
+                                       style="margin-right: 10px;">
+                                <input type="text" name="office_in" placeholder="Office In Id"
+                                       style="margin-right: 10px;">
+                                <input type="datetime-local" name="date_out" style="margin-right: 10px;">
+                                <input type="datetime-local" name="date_in" style="margin-right: 10px;">
+                                '. submit_button('Test Check Availability', 'primary', 'test_check_availability', false);
+    }
 
-        $fields['settings_page'] = array(
-            'username' => 'API Username',
-            'password' => 'API Password',
+    public function render_credentials_tab(): void
+    {
+        $credentials = get_option('car_availability_settings');
+
+        $fields = array(
+            'username' => 'Username',
+            'password' => 'Password',
             'client_id' => 'Client Id',
             'secret' => 'Secret',
-            'api_base_url' => 'API Base Url',
+            'api_base_url' => 'API Url',
         );
 
-        foreach ($fields['settings_page'] as $field => $label) {
-            add_settings_field(
-                $field,
-                $label,
-                array($this, 'field_callback'),
-                'car-availability-settings',
-                'car_availability_section',
-                array('field' => $field)
-            );
+        foreach ($fields as $field => $label) {
+            $value = isset($credentials[$field]) ? esc_attr($credentials[$field]) : '';
+            $inputType = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
+            ?>
+            <div>
+                <label for="<?= $field ?>-input"><?= $label ?></label>
+                <input type="<?= $inputType ?>" id="<?= $field ?>-input"
+                       name="car_availability_settings[<?= $field ?>]" value="<?= $value ?>" class="regular-text">
+                <?php if ($inputType === 'password') { ?>
+                    <label class="show-input-value">
+                        <input type="checkbox" class="show-password-checkbox" data-target="<?= $field ?>-input"> Show
+                    </label>
+                <?php } ?>
+            </div>
+        <?php }
+
+        ?>
+        <input type="submit" name="save_credentials" class="button button-primary" value="Save Changes">
+        <?php
+
+        if (isset($_POST['save_credentials'])) {
+            update_option('car_availability_settings', $_POST['car_availability_settings']);
+            echo '<div class="updated"><p>Settings saved.</p></div>';
         }
-
-        add_settings_section(
-            'car_availability_section',
-            'Car Availability | API credentials',
-            function(){ echo 'Enter your API credentials and endpoint below:';},
-            'car-availability-settings'
-        );
-
-        $fields['test_api_page'] = array(
-            'test_token' => 'Test Token',
-            'test_offices' => 'Test Offices',
-            'test_car_categories' => 'Test Car Categories'
-        );
-
-        foreach ($fields['test_api_page'] as $field => $label) {
-            add_settings_field(
-                $field,
-                $label,
-                array($this, 'field_callback'),
-                'car-availability-test-api',
-                'car_availability_test_api_section',
-                array('field' => $field, 'label' => $label)
-            );
-        }
-
-        add_settings_section(
-            'car_availability_test_api_section',
-            'Car Availability | API Test',
-            function(){ echo 'Test API responses here';},
-            'car-availability-test-api'
-        );
     }
 
-    public function field_callback($args): void
+    public function render_email_settings_tab(): void
     {
-        $options = get_option('car_availability_settings');
-        $field = $args['field'];
-        $label = $args['label'];
-        $value = $options[$field] ?? '';
+        $credentials = get_option('car_availability_settings_email');
 
-        $isPasswordField = ($field === 'password' || $field === 'secret');
-        $inputType = $isPasswordField ? 'password' : 'text';
-        $inputClass = $isPasswordField ? 'password-input' : '';
+        $fields = array(
+            'email' => 'Email'
+        );
 
-        $dataAttribute = $isPasswordField ? 'data-password-input' : '';
+        foreach ($fields as $field => $label) {
+            $value = isset($credentials[$field]) ? esc_attr($credentials[$field]) : '';
+            $inputType = ($field === 'password' || $field === 'secret') ? 'password' : 'text';
+            ?>
+            <div>
+                <label for="<?= $field ?>-input"><?= $label ?></label>
+                <input type="<?= $inputType ?>" id="<?= $field ?>-input"
+                       name="car_availability_settings_email[<?= $field ?>]" value="<?= $value ?>" class="regular-text">
+                <?php if ($inputType === 'password') { ?>
+                    <label class="show-input-value">
+                        <input type="checkbox" class="show-password-checkbox" data-target="<?= $field ?>-input"> Show
+                    </label>
+                <?php } ?>
+            </div>
+        <?php }
 
-        if (in_array($field, ['test_offices', 'test_car_categories', 'test_token'])){
-            submit_button($label, 'primary', $field, false);
-        } else {
-            echo "<input type='$inputType' id='$field-input' name='car_availability_settings[$field]' value='$value' class='$inputClass' $dataAttribute />";
+        ?>
+        <input type="submit" name="save_email_settings" class="button button-primary" value="Save Changes">
+        <?php
 
-            if ($isPasswordField) {
-                echo "<label><input type='checkbox' class='show-password-checkbox' data-target='$field-input'> Show $label</label>";
-            }
+        if (isset($_POST['save_email_settings'])) {
+            update_option('car_availability_settings_email', $_POST['car_availability_settings_email']);
+            echo '<div class="updated"><p>Settings saved.</p></div>';
         }
     }
 
@@ -179,7 +221,7 @@ class CarAvailabilityAdminSettings {
     {
         if (!empty($response)) {
             update_option('car_availability_api_response', print_r($response, true));
-            echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>' . print_r($response, true) . '</textarea>';
+            echo '<textarea rows="15" cols="50" style="width: 100%;" readonly>Last response: ' . print_r($response, true) . '</textarea>';
         }
     }
 }
