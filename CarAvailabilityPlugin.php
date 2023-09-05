@@ -27,8 +27,7 @@ class CarAvailabilityPlugin {
 
     public function __construct() {
         add_action('wp_enqueue_scripts', array($this, 'enqueueFrontendStilesAndScripts'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminStyles'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminScripts'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminStylesAndScripts'));
 
         $frontend = new CarAvailabilityFrontend();
         $frontend->init();
@@ -47,20 +46,17 @@ class CarAvailabilityPlugin {
     {
         if (has_shortcode(get_post()->post_content, 'car_availability_frontend_form_render') ||
             has_shortcode(get_post()->post_content, 'car_availability_offices_render') ||
-            has_shortcode(get_post()->post_content, 'car_availability_car_categories_render')) {
+            has_shortcode(get_post()->post_content, 'car_availability_car_categories_render'))
+        {
             wp_enqueue_script('jquery');
             wp_enqueue_script('car-availability-scripts', plugin_dir_url(__FILE__) . 'assets/js/script.js', array('jquery'), null, true);
             wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/styles.css');
         }
     }
 
-    public function enqueueAdminStyles(): void
+    public function enqueueAdminStylesAndScripts(): void
     {
         wp_enqueue_style('car-availability-styles', plugin_dir_url(__FILE__) . 'assets/css/car-availability-admin-settings-styles.css');
-    }
-
-    public function enqueueAdminScripts(): void
-    {
         wp_enqueue_script('car-availability-admin-script', plugin_dir_url(__FILE__) . 'assets/js/car-availability-admin-settings-script.js', array('jquery'), null, true);
     }
 }
