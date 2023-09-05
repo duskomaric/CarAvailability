@@ -19,6 +19,17 @@ class CarAvailabilityFrontend {
     public function process_form_submission(): void
     {
         if (isset($_POST['check_availability_submit'])) {
+            if (
+                !empty(sanitize_text_field($_POST['office_in'])) ||
+                !empty(sanitize_text_field($_POST['office_out'])) ||
+                !empty(date('Y-m-d\TH:i:s', strtotime(sanitize_text_field($_POST['date_in'])))) ||
+                !empty(date('Y-m-d\TH:i:s', strtotime(sanitize_text_field($_POST['date_out']))))
+            ) {
+                wp_die('Something went wrong. Please try again later.', 'Error', [
+                    'response' => 422,
+                    'back_link' => true,
+                ]);
+            }
             $this->submitted_check_availability_form = true;
             $this->office_in = sanitize_text_field($_POST['office_in']);
             $this->office_out = sanitize_text_field($_POST['office_out']);

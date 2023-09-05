@@ -113,13 +113,25 @@ class CarAvailabilityAdminSettings
         echo '</div>';
 
         if (isset($_POST['test_check_availability'])) {
-            $response = (new CarAvailabilityApi())
-                ->checkAvailability(
-                    $_POST['office_out'],
-                    $_POST['office_in'],
-                    $_POST['date_out'],
-                    $_POST['date_in']
+            // Validate input values
+            $office_out = $_POST['office_out'] ?? '';
+            $office_in = $_POST['office_in'] ?? '';
+            $date_out = $_POST['date_out'] ?? '';
+            $date_in = $_POST['date_in'] ?? '';
+
+            if (empty($office_out) || empty($office_in) || empty($date_out) || empty($date_in)) {
+                wp_die('Fill all the fields, please.', 'Error', [
+                    'response' => 422,
+                    'back_link' => true,
+                ]);
+            } else {
+                $response = (new CarAvailabilityApi())->checkAvailability(
+                    $office_out,
+                    $office_in,
+                    $date_out,
+                    $date_in
                 );
+            }
         }
 
         if (isset($_POST['test_token'])) {
@@ -151,7 +163,7 @@ class CarAvailabilityAdminSettings
                                        style="margin-right: 10px;">
                                 <input type="datetime-local" name="date_out" style="margin-right: 10px;">
                                 <input type="datetime-local" name="date_in" style="margin-right: 10px;">
-                                '. submit_button('Test Check Availability', 'primary', 'test_check_availability', false);
+                                '. submit_button('Test Check Availability', 'primary', 'test_check_availability', false). '</div>';
     }
 
     public function render_credentials_tab(): void
