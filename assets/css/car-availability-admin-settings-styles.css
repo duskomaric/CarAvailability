@@ -55,7 +55,7 @@
 
 .wrap.car-availability input[type="text"],
 .wrap.car-availability input[type="datetime-local"],
-.wrap.car-availability nput[type="password"] {
+.wrap.car-availability input[type="password"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
