@@ -50,9 +50,9 @@
     display: block;
 }
 
-input[type="text"],
-input[type="datetime-local"],
-input[type="password"] {
+.wrap.car-availability input[type="text"],
+.wrap.car-availability input[type="datetime-local"],
+.wrap.car-availability nput[type="password"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -61,7 +61,7 @@ input[type="password"] {
     font-size: 16px;
 }
 
-input[type="submit"] {
+.wrap.car-availability input[type="submit"] {
     color: #fff !important;
     background-color: #e74c3c !important;
     padding: 10px 20px !important;
